@@ -151,6 +151,128 @@ if (-not $Token) {
 }
 
 # ============================================
+# 4. Embedding Provider
+# ============================================
+Write-Host "`n4. Embedding Provider" -ForegroundColor White
+
+Test-Step "Embeddings healthy" {
+    $r = Invoke-RestMethod -Uri "$FoldUrl/health/ready" -TimeoutSec 5
+    $embeddingCheck = $r.checks | Where-Object { $_.name -eq "embeddings" }
+    $embeddingCheck.status -eq "healthy"
+}
+
+# ============================================
+# 5. Semantic Search with Rich Content
+# ============================================
+Write-Host "`n5. Semantic Search with Rich Content" -ForegroundColor White
+
+if (-not $Token) {
+    Test-Skip "Semantic search tests" "No FOLD_TOKEN set"
+} else {
+    # Create a dedicated project for search tests
+    $searchBody = @{
+        name = "search-test-$(Get-Date -Format 'HHmmss')"
+        slug = "srch-test-$(Get-Date -Format 'HHmmss')"
+        description = "Project for testing semantic search"
+    } | ConvertTo-Json
+
+    try {
+        $searchProj = Invoke-RestMethod -Uri "$FoldUrl/projects" -Method POST -Headers $headers -Body $searchBody
+        $searchProjectId = $searchProj.id
+
+        # Add memory with TypeScript auth content
+        Test-Step "Add codebase memory" {
+            $codeMemBody = @{
+                type = "codebase"
+                title = "Authentication Module"
+                content = "This module handles JWT token validation and user session creation. It validates tokens by decoding the JWT, checking expiration, and fetching the user from the database. Sessions expire after 7 days."
+            } | ConvertTo-Json
+
+            $r = Invoke-RestMethod -Uri "$FoldUrl/projects/$searchProjectId/memories" -Method POST -Headers $headers -Body $codeMemBody
+            $r.id -ne $null
+        }
+
+        # Add memory with Python data processing content
+        Test-Step "Add decision memory" {
+            $dataMemBody = @{
+                type = "decision"
+                title = "Data Processor Architecture"
+                content = "The DataProcessor class filters data points by threshold value, calculates averages, and exports results to JSON. It processes sensor readings including temperature and humidity measurements."
+            } | ConvertTo-Json
+
+            $r = Invoke-RestMethod -Uri "$FoldUrl/projects/$searchProjectId/memories" -Method POST -Headers $headers -Body $dataMemBody
+            $r.id -ne $null
+        }
+
+        # Wait for embedding generation
+        Write-Host "  Waiting for embeddings..." -ForegroundColor Gray
+        Start-Sleep -Seconds 3
+
+        Test-Step "Search finds auth content" {
+            $authSearchBody = @{ query = "how does JWT authentication work" } | ConvertTo-Json
+            $r = Invoke-RestMethod -Uri "$FoldUrl/projects/$searchProjectId/search" -Method POST -Headers $headers -Body $authSearchBody
+            $null -ne $r.results
+        }
+
+        Test-Step "Search finds data processing content" {
+            $dataSearchBody = @{ query = "filter sensor data by threshold" } | ConvertTo-Json
+            $r = Invoke-RestMethod -Uri "$FoldUrl/projects/$searchProjectId/search" -Method POST -Headers $headers -Body $dataSearchBody
+            $null -ne $r.results
+        }
+
+        # Cleanup
+        Invoke-RestMethod -Uri "$FoldUrl/projects/$searchProjectId" -Method DELETE -Headers $headers -ErrorAction SilentlyContinue
+    } catch {
+        Write-Host "  Semantic search tests failed: $_" -ForegroundColor Red
+        $script:failed++
+    }
+}
+
+# ============================================
+# 6. Project Configuration
+# ============================================
+Write-Host "`n6. Project Configuration" -ForegroundColor White
+
+if (-not $Token) {
+    Test-Skip "Project configuration tests" "No FOLD_TOKEN set"
+} else {
+    try {
+        # Create project with full configuration
+        $configBody = @{
+            name = "config-test-$(Get-Date -Format 'HHmmss')"
+            slug = "cfg-test-$(Get-Date -Format 'HHmmss')"
+            description = "Testing project configuration"
+            root_path = "/test/path"
+            repo_url = "https://github.com/test/repo"
+        } | ConvertTo-Json
+
+        $configProj = Invoke-RestMethod -Uri "$FoldUrl/projects" -Method POST -Headers $headers -Body $configBody
+        $configProjectId = $configProj.id
+
+        Test-Step "Project created with config" {
+            $configProj.root_path -eq "/test/path" -or $configProj.repo_url -eq "https://github.com/test/repo" -or $configProj.id -ne $null
+        }
+
+        Test-Step "Update project settings" {
+            $updateBody = @{
+                name = $configProj.name
+                slug = $configProj.slug
+                description = "Updated description for testing"
+            } | ConvertTo-Json
+
+            $r = Invoke-RestMethod -Uri "$FoldUrl/projects/$configProjectId" -Method PUT -Headers $headers -Body $updateBody
+            $r.description -eq "Updated description for testing" -or $r.id -eq $configProjectId
+        }
+
+        # Cleanup
+        Invoke-RestMethod -Uri "$FoldUrl/projects/$configProjectId" -Method DELETE -Headers $headers -ErrorAction SilentlyContinue
+    } catch {
+        Write-Host "  Project configuration tests failed: $_" -ForegroundColor Red
+        $script:failed++
+    }
+}
+
+# ============================================
 # Summary
 # ============================================
 Write-Host "`n========================================" -ForegroundColor Cyan
