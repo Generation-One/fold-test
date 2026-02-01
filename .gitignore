@@ -1,0 +1,11 @@
+# Environment files - NEVER COMMIT
+.env
+.env.*
+*.local
+
+# Test output
+*.log
+test-results/
+
+# Temp files
+*.tmp
