@@ -143,7 +143,7 @@ if (-not $Token) {
         }
 
         # Cleanup
-        Invoke-RestMethod -Uri "$FoldUrl/projects/$memProjectId" -Method DELETE -Headers $headers -ErrorAction SilentlyContinue
+        Invoke-RestMethod -Uri "$FoldUrl/projects/$memProjectId" -Method DELETE -Headers $headers -ErrorAction SilentlyContinue | Out-Null
     } catch {
         Write-Host "  Memory tests failed: $_" -ForegroundColor Red
         $script:failed++
@@ -221,7 +221,7 @@ if (-not $Token) {
         }
 
         # Cleanup
-        Invoke-RestMethod -Uri "$FoldUrl/projects/$searchProjectId" -Method DELETE -Headers $headers -ErrorAction SilentlyContinue
+        Invoke-RestMethod -Uri "$FoldUrl/projects/$searchProjectId" -Method DELETE -Headers $headers -ErrorAction SilentlyContinue | Out-Null
     } catch {
         Write-Host "  Semantic search tests failed: $_" -ForegroundColor Red
         $script:failed++
@@ -265,7 +265,7 @@ if (-not $Token) {
         }
 
         # Cleanup
-        Invoke-RestMethod -Uri "$FoldUrl/projects/$configProjectId" -Method DELETE -Headers $headers -ErrorAction SilentlyContinue
+        Invoke-RestMethod -Uri "$FoldUrl/projects/$configProjectId" -Method DELETE -Headers $headers -ErrorAction SilentlyContinue | Out-Null
     } catch {
         Write-Host "  Project configuration tests failed: $_" -ForegroundColor Red
         $script:failed++
