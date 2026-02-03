@@ -11,8 +11,8 @@ tags:
 file_path: sample-files/sample.ts
 language: typescript
 memory_type: codebase
-created_at: 2026-02-03T09:28:37.966656300Z
-updated_at: 2026-02-03T09:28:37.966656300Z
+created_at: 2026-02-03T09:45:11.512212500Z
+updated_at: 2026-02-03T09:45:11.512212500Z
 ---
 
-This TypeScript module provides authentication utilities for validating JWT tokens and creating user sessions. It serves as a core authentication service that handles token validation, user retrieval, and session creation with expiration management. The file implements async/await patterns for database operations and JWT cryptographic operations, following a service-oriented architecture with clear separation between public API functions and internal helper stubs.
+This TypeScript module provides core authentication functionality for user session management, implementing JWT token validation and creation patterns. It defines interfaces for User and AuthToken entities and exports two primary async functions: validateToken for verifying JWT tokens and returning authenticated users, and createSession for generating new authentication tokens with 7-day expiration. The file demonstrates a service-layer approach to authentication with stub implementations of helper functions, designed for integration with a broader authentication system that includes database lookups and JWT cryptographic operations.
