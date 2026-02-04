@@ -148,6 +148,11 @@ Start-Sleep -Seconds 2
 $dbMemCount = Query-Db "SELECT COUNT(*) FROM memories WHERE project_id = '$projectId';"
 Write-Test "Memories in database" ($dbMemCount -eq $addedMemories) "Database count: $dbMemCount, Expected: $addedMemories"
 
+# Test 5b: Verify content is stored in SQLite (not fold/ directory)
+# Since these are file-sourced memories, content (LLM summaries) should be in the content column
+$contentInDb = Query-Db "SELECT COUNT(*) FROM memories WHERE project_id = '$projectId' AND content IS NOT NULL AND content != '';"
+Write-Test "Content stored in SQLite" ($contentInDb -eq $addedMemories) "Memories with content in DB: $contentInDb / $addedMemories"
+
 # Test 6: Check Qdrant Collection
 Write-Host "`n5. VECTOR STORAGE (QDRANT)" -ForegroundColor White
 try {
