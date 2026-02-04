@@ -15,7 +15,8 @@ param(
     [string]$SampleFilesPath = "d:\hh\git\g1\fold\test\sample-files",
     [string]$DbPath = "d:\hh\git\g1\fold\srv\data\fold.db",
     [switch]$Verbose,
-    [switch]$StopOnFirstFailure
+    [switch]$StopOnFirstFailure,
+    [switch]$SkipCleanup
 )
 
 $ErrorActionPreference = "Stop"
@@ -231,11 +232,17 @@ try {
 
 # Test 12: Cleanup
 Write-Host "`n11. CLEANUP" -ForegroundColor White
-try {
-    Invoke-RestMethod -Uri "$FoldUrl/projects/$projectId" -Method DELETE -Headers $headers -TimeoutSec 10 | Out-Null
-    Write-Test "Delete project" $true "Project deleted"
-} catch {
-    Write-Test "Delete project" $false "Error: $_"
+if ($SkipCleanup) {
+    Write-Host "   Skipping cleanup (-SkipCleanup flag set)" -ForegroundColor Yellow
+    Write-Host "   Project ID: $projectId" -ForegroundColor Cyan
+    Write-Host "   Project Slug: $projectSlug" -ForegroundColor Cyan
+} else {
+    try {
+        Invoke-RestMethod -Uri "$FoldUrl/projects/$projectId" -Method DELETE -Headers $headers -TimeoutSec 10 | Out-Null
+        Write-Test "Delete project" $true "Project deleted"
+    } catch {
+        Write-Test "Delete project" $false "Error: $_"
+    }
 }
 
 # Summary
