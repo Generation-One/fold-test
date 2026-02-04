@@ -6,7 +6,10 @@ param(
     [string]$FoldUrl = "http://localhost:8765"
 )
 
-$headers = @{ "Authorization" = "Bearer $Token"; "Content-Type" = "application/json" }
+$headers = @{
+    "Authorization" = "Bearer $Token"
+    "Content-Type" = "application/json"
+}
 
 Write-Host "`n========================================" -ForegroundColor Cyan
 Write-Host "  DECAY / RECENCY BIAS TEST" -ForegroundColor Cyan
@@ -28,7 +31,6 @@ Write-Host "`n=== Adding memories ===" -ForegroundColor Cyan
 
 # Add memories - all have same semantic content but we'll test different decay params
 $memBody = @{
-    type = "general"
     title = "API Documentation Guide"
     content = "This guide explains how to use the REST API endpoints for authentication, data retrieval, and error handling."
 } | ConvertTo-Json
@@ -42,12 +44,13 @@ Write-Host "`n=== Testing decay parameters ===" -ForegroundColor Cyan
 
 # Test 1: Pure semantic search (strength_weight = 0)
 Write-Host "`nTest 1: Pure semantic (strength_weight=0)" -ForegroundColor White
+# Set project algorithm config to strength_weight=0
+$configBody = @{ strength_weight = 0.0 } | ConvertTo-Json
+Invoke-RestMethod -Uri "$FoldUrl/projects/$projectId/config/algorithm" -Method PUT -Headers $headers -Body $configBody | Out-Null
 $searchBody = @{
     query = "how to use REST API"
-    strength_weight = 0.0
-    decay_half_life_days = 30
 } | ConvertTo-Json
-$result = Invoke-RestMethod -Uri "$FoldUrl/projects/$projectId/memories/search" -Method POST -Headers $headers -Body $searchBody
+$result = Invoke-RestMethod -Uri "$FoldUrl/projects/$projectId/search" -Method POST -Headers $headers -Body $searchBody
 if ($result.results.Count -gt 0) {
     $r = $result.results[0]
     Write-Host "  Result: score=$([math]::Round($r.score, 3)), strength=$([math]::Round($r.strength, 3)), combined=$([math]::Round($r.combined_score, 3))" -ForegroundColor Gray
@@ -62,12 +65,13 @@ if ($result.results.Count -gt 0) {
 
 # Test 2: Balanced (strength_weight = 0.3, default)
 Write-Host "`nTest 2: Balanced (strength_weight=0.3)" -ForegroundColor White
+# Set project algorithm config to strength_weight=0.3
+$configBody = @{ strength_weight = 0.3 } | ConvertTo-Json
+Invoke-RestMethod -Uri "$FoldUrl/projects/$projectId/config/algorithm" -Method PUT -Headers $headers -Body $configBody | Out-Null
 $searchBody = @{
     query = "how to use REST API"
-    strength_weight = 0.3
-    decay_half_life_days = 30
 } | ConvertTo-Json
-$result = Invoke-RestMethod -Uri "$FoldUrl/projects/$projectId/memories/search" -Method POST -Headers $headers -Body $searchBody
+$result = Invoke-RestMethod -Uri "$FoldUrl/projects/$projectId/search" -Method POST -Headers $headers -Body $searchBody
 if ($result.results.Count -gt 0) {
     $r = $result.results[0]
     Write-Host "  Result: score=$([math]::Round($r.score, 3)), strength=$([math]::Round($r.strength, 3)), combined=$([math]::Round($r.combined_score, 3))" -ForegroundColor Gray
@@ -83,12 +87,13 @@ if ($result.results.Count -gt 0) {
 
 # Test 3: Pure strength (strength_weight = 1.0)
 Write-Host "`nTest 3: Pure strength (strength_weight=1.0)" -ForegroundColor White
+# Set project algorithm config to strength_weight=1.0
+$configBody = @{ strength_weight = 1.0 } | ConvertTo-Json
+Invoke-RestMethod -Uri "$FoldUrl/projects/$projectId/config/algorithm" -Method PUT -Headers $headers -Body $configBody | Out-Null
 $searchBody = @{
     query = "how to use REST API"
-    strength_weight = 1.0
-    decay_half_life_days = 30
 } | ConvertTo-Json
-$result = Invoke-RestMethod -Uri "$FoldUrl/projects/$projectId/memories/search" -Method POST -Headers $headers -Body $searchBody
+$result = Invoke-RestMethod -Uri "$FoldUrl/projects/$projectId/search" -Method POST -Headers $headers -Body $searchBody
 if ($result.results.Count -gt 0) {
     $r = $result.results[0]
     Write-Host "  Result: score=$([math]::Round($r.score, 3)), strength=$([math]::Round($r.strength, 3)), combined=$([math]::Round($r.combined_score, 3))" -ForegroundColor Gray
@@ -103,12 +108,13 @@ if ($result.results.Count -gt 0) {
 
 # Test 4: Very short half-life (more aggressive decay)
 Write-Host "`nTest 4: Short half-life (decay_half_life_days=1)" -ForegroundColor White
+# Set project algorithm config to short half-life
+$configBody = @{ strength_weight = 0.5; decay_half_life_days = 1.0 } | ConvertTo-Json
+Invoke-RestMethod -Uri "$FoldUrl/projects/$projectId/config/algorithm" -Method PUT -Headers $headers -Body $configBody | Out-Null
 $searchBody = @{
     query = "how to use REST API"
-    strength_weight = 0.5
-    decay_half_life_days = 1
 } | ConvertTo-Json
-$result = Invoke-RestMethod -Uri "$FoldUrl/projects/$projectId/memories/search" -Method POST -Headers $headers -Body $searchBody
+$result = Invoke-RestMethod -Uri "$FoldUrl/projects/$projectId/search" -Method POST -Headers $headers -Body $searchBody
 if ($result.results.Count -gt 0) {
     $r = $result.results[0]
     Write-Host "  Result: score=$([math]::Round($r.score, 3)), strength=$([math]::Round($r.strength, 3)), combined=$([math]::Round($r.combined_score, 3))" -ForegroundColor Gray
@@ -119,12 +125,13 @@ if ($result.results.Count -gt 0) {
 
 # Test 5: Very long half-life (slow decay)
 Write-Host "`nTest 5: Long half-life (decay_half_life_days=365)" -ForegroundColor White
+# Set project algorithm config to long half-life
+$configBody = @{ strength_weight = 0.5; decay_half_life_days = 365.0 } | ConvertTo-Json
+Invoke-RestMethod -Uri "$FoldUrl/projects/$projectId/config/algorithm" -Method PUT -Headers $headers -Body $configBody | Out-Null
 $searchBody = @{
     query = "how to use REST API"
-    strength_weight = 0.5
-    decay_half_life_days = 365
 } | ConvertTo-Json
-$result = Invoke-RestMethod -Uri "$FoldUrl/projects/$projectId/memories/search" -Method POST -Headers $headers -Body $searchBody
+$result = Invoke-RestMethod -Uri "$FoldUrl/projects/$projectId/search" -Method POST -Headers $headers -Body $searchBody
 if ($result.results.Count -gt 0) {
     $r = $result.results[0]
     Write-Host "  Result: score=$([math]::Round($r.score, 3)), strength=$([math]::Round($r.strength, 3)), combined=$([math]::Round($r.combined_score, 3))" -ForegroundColor Gray

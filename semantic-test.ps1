@@ -29,27 +29,22 @@ Write-Host "`nAdding test memories..." -ForegroundColor White
 
 $memories = @(
     @{
-        type = "codebase"
         title = "User Login System"
         content = "The authentication module uses JWT tokens with RSA-256 signing. Users log in with email and password, which is validated against bcrypt hashes in the database. Sessions expire after 24 hours and require re-authentication."
     },
     @{
-        type = "decision"
         title = "ETL Pipeline Design"
         content = "We chose Apache Kafka for the data ingestion layer because it handles high throughput message streaming. Data is transformed using Spark jobs and loaded into PostgreSQL for analytics queries."
     },
     @{
-        type = "spec"
         title = "Database Schema"
         content = "The users table contains id, email, password_hash, created_at, and last_login fields. Foreign keys link to orders, preferences, and sessions tables. We use PostgreSQL with connection pooling via PgBouncer."
     },
     @{
-        type = "codebase"
         title = "React Dashboard"
         content = "The dashboard uses React 18 with TypeScript. State management is handled by Zustand. Components include charts from Recharts library, tables with virtualization, and real-time updates via WebSocket connections."
     },
     @{
-        type = "decision"
         title = "Cloud Infrastructure"
         content = "Kubernetes cluster on AWS EKS handles container orchestration. We use Terraform for infrastructure as code, with separate staging and production environments. Auto-scaling is configured based on CPU utilization."
     }

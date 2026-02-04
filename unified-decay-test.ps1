@@ -27,7 +27,6 @@ Write-Host "  Project: $($project.name) [$projectId]" -ForegroundColor Green
 Write-Host "`n=== Adding memory ===" -ForegroundColor Cyan
 
 $memBody = @{
-    type = "general"
     title = "API Guide"
     content = "This guide explains REST API authentication using JWT tokens and OAuth flows."
 } | ConvertTo-Json
@@ -42,8 +41,9 @@ Write-Host "`n=== Testing unified search with decay params ===" -ForegroundColor
 $script:passed = 0
 $script:failed = 0
 
-# Test 1: Default parameters
+# Test 1: Default parameters (no config changes needed)
 Write-Host "`nTest 1: Default parameters (strength_weight=0.3, half_life=30)" -ForegroundColor White
+# Defaults are already strength_weight=0.3 and decay_half_life_days=30
 $searchBody = @{
     query = "API authentication"
 } | ConvertTo-Json
@@ -65,10 +65,11 @@ if ($result.results.Count -gt 0) {
 
 # Test 2: Pure semantic (strength_weight=0)
 Write-Host "`nTest 2: Pure semantic (strength_weight=0)" -ForegroundColor White
+# Set project algorithm config to strength_weight=0
+$configBody = @{ strength_weight = 0.0 } | ConvertTo-Json
+Invoke-RestMethod -Uri "$FoldUrl/projects/$projectId/config/algorithm" -Method PUT -Headers $headers -Body $configBody | Out-Null
 $searchBody = @{
     query = "API authentication"
-    strength_weight = 0.0
-    decay_half_life_days = 30
 } | ConvertTo-Json
 $result = Invoke-RestMethod -Uri "$FoldUrl/projects/$projectId/search" -Method POST -Headers $headers -Body $searchBody
 if ($result.results.Count -gt 0) {
@@ -88,10 +89,11 @@ if ($result.results.Count -gt 0) {
 
 # Test 3: Pure strength (strength_weight=1.0)
 Write-Host "`nTest 3: Pure strength (strength_weight=1.0)" -ForegroundColor White
+# Set project algorithm config to strength_weight=1.0
+$configBody = @{ strength_weight = 1.0 } | ConvertTo-Json
+Invoke-RestMethod -Uri "$FoldUrl/projects/$projectId/config/algorithm" -Method PUT -Headers $headers -Body $configBody | Out-Null
 $searchBody = @{
     query = "API authentication"
-    strength_weight = 1.0
-    decay_half_life_days = 30
 } | ConvertTo-Json
 $result = Invoke-RestMethod -Uri "$FoldUrl/projects/$projectId/search" -Method POST -Headers $headers -Body $searchBody
 if ($result.results.Count -gt 0) {

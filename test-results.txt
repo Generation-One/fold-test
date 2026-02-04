@@ -1,0 +1,74 @@
+
+========================================
+  FOLD V2 COMPREHENSIVE SMOKE TEST SUITE
+========================================
+
+1. PROJECT MANAGEMENT
+  Create project with defaults... PASS
+True
+  Verify default decay config (strength_weight=0.3)... PASS
+True
+  Update decay config... PASS
+True
+  List projects... PASS
+True
+
+2. MEMORY OPERATIONS
+  Create memory without type field... PASS
+True
+  Verify source set to agent... PASS
+True
+  Create memory with file_path... PASS
+True
+  List memories... PASS
+True
+
+3. SEMANTIC SEARCH
+  Waiting for embeddings...
+  Search with decay config... PASS
+True
+  Search includes decay fields (score, strength, combined_score)... FAIL
+False
+  Change strength_weight to 0 (pure semantic)... FAIL
+False
+  Change strength_weight to 1.0 (pure strength)... PASS
+True
+
+4. CHUNK DATABASE VERIFICATION
+  ERROR: Failed to connect to database
+
+5. API ENDPOINTS
+  GET /health... PASS
+True
+  GET /projects (list)... PASS
+True
+  GET /projects/:id... PASS
+True
+  POST /projects/:id/memories (create)... PASS
+True
+  GET /projects/:id/memories (list)... PASS
+True
+  POST /projects/:id/search (search)... FAIL
+False
+  GET /projects/:id/config/algorithm... PASS
+True
+  PUT /projects/:id/config/algorithm... PASS
+True
+
+6. ERROR HANDLING
+  Reject invalid strength_weight... PASS
+True
+  Reject empty memory content... PASS
+True
+
+7. CLEANUP
+  Delete project... PASS
+True
+
+========================================
+  RESULTS
+========================================
+  Passed:  20
+  Failed:  3
+
+Some tests failed. Check output above.

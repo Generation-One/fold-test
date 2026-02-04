@@ -120,7 +120,6 @@ if (-not $Token) {
 
         Test-Step "Add memory" {
             $memBody = @{
-                type = "general"
                 title = "Test Memory"
                 content = "This is a test memory for automated testing."
             } | ConvertTo-Json
@@ -183,7 +182,6 @@ if (-not $Token) {
         # Add memory with TypeScript auth content
         Test-Step "Add codebase memory" {
             $codeMemBody = @{
-                type = "codebase"
                 title = "Authentication Module"
                 content = "This module handles JWT token validation and user session creation. It validates tokens by decoding the JWT, checking expiration, and fetching the user from the database. Sessions expire after 7 days."
             } | ConvertTo-Json
@@ -195,7 +193,6 @@ if (-not $Token) {
         # Add memory with Python data processing content
         Test-Step "Add decision memory" {
             $dataMemBody = @{
-                type = "decision"
                 title = "Data Processor Architecture"
                 content = "The DataProcessor class filters data points by threshold value, calculates averages, and exports results to JSON. It processes sensor readings including temperature and humidity measurements."
             } | ConvertTo-Json
