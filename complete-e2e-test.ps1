@@ -81,6 +81,8 @@ try {
         name = "Complete E2E Test"
         slug = "complete-e2e-$(Get-Date -Format 'HHmmss')"
         description = "Complete end-to-end system test with all features"
+        provider = "local"
+        root_path = $SampleFilesPath
     } | ConvertTo-Json
 
     $project = Invoke-RestMethod -Uri "$FoldUrl/projects" -Method POST -Headers $headers -Body $projectBody -TimeoutSec 10
