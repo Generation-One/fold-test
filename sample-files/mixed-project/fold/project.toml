@@ -10,5 +10,5 @@ exclude = []
 
 [embedding]
 provider = "gemini"
-model = "text-embedding-004"
+model = "embedding-001"
 dimension = 768
