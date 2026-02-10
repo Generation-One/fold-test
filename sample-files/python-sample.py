@@ -167,6 +167,11 @@ def format_datetime(dt: datetime) -> str:
     return dt.isoformat()
 
 
+def can_edit(user: User) -> bool:
+    """Check if a user has at least editor privileges."""
+    return user.role in (UserRole.ADMIN, UserRole.EDITOR)
+
+
 if __name__ == "__main__":
     # Example usage
     service = UserService()
