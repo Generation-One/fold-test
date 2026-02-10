@@ -172,5 +172,12 @@ export function generateId(): string {
     return crypto.randomUUID();
 }
 
+/**
+ * Check if a user has at least editor privileges.
+ */
+export function canEdit(user: User): boolean {
+    return user.role === 'admin' || user.role === 'editor';
+}
+
 // Default export
 export default UserService;
