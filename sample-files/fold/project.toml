@@ -1,0 +1,14 @@
+[project]
+id = "ccb0bd7f-98e6-458a-be5f-c33ebce72df7"
+slug = "complete-e2e-232138"
+name = "Complete E2E Test"
+created_at = "2026-02-12T22:21:43.309536Z"
+
+[indexing]
+include = []
+exclude = []
+
+[embedding]
+provider = "gemini"
+model = "gemini-embedding-001"
+dimension = 768
