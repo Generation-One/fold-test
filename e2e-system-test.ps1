@@ -28,7 +28,7 @@ Show detailed output
 #>
 
 param(
-    [string]$Token = "fold_7tL9ZOLlVpC1EFhCxWsAfgjIlsyACfABGOyNCabt",
+    [string]$Token = $env:FOLD_TOKEN,
     [string]$FoldUrl = "http://localhost:8765",
     [string]$SampleFilesPath = "d:\hh\git\g1\fold\test\sample-files",
     [string]$DbPath = "d:\hh\git\g1\fold\srv\data\fold.db",
@@ -176,15 +176,10 @@ try {
     Write-Test "Vectors stored in Qdrant" $false "Qdrant connection failed"
 }
 
-# Test 8: Chunking Verification
-Write-Host "`n6. SEMANTIC CHUNKING" -ForegroundColor White
-$chunkCount = Query-Db "SELECT COUNT(*) FROM chunks WHERE project_id = '$projectId';"
-Write-Test "Chunks created" ($chunkCount -gt 0) "Total chunks: $chunkCount"
-
-if ($chunkCount -gt 0) {
-    $chunkTypes = Query-Db "SELECT DISTINCT node_type, COUNT(*) as cnt FROM chunks WHERE project_id = '$projectId' GROUP BY node_type;"
-    Write-Host "   Chunk types: $($chunkTypes | Out-String)" -ForegroundColor Gray
-}
+# Test 8: Memory Verification
+Write-Host "`n6. MEMORY VERIFICATION" -ForegroundColor White
+$memCount = Query-Db "SELECT COUNT(*) FROM memories WHERE project_id = '$projectId';"
+Write-Test "Memories stored" ($memCount -gt 0) "Total memories: $memCount"
 
 # Test 9: Search Functionality
 Write-Host "`n7. SEARCH & RETRIEVAL" -ForegroundColor White

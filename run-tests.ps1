@@ -75,6 +75,8 @@ if (-not $Token) {
             name = "test-project-$(Get-Date -Format 'HHmmss')"
             slug = "test-proj-$(Get-Date -Format 'HHmmss')"
             description = "Automated test project"
+            provider = "local"
+            root_path = "d:/hh/git/g1/fold/test/sample-files"
         } | ConvertTo-Json
 
         $r = Invoke-RestMethod -Uri "$FoldUrl/projects" -Method POST -Headers $headers -Body $body
@@ -112,6 +114,8 @@ if (-not $Token) {
     $body = @{
         name = "memory-test-$(Get-Date -Format 'HHmmss')"
         slug = "mem-test-$(Get-Date -Format 'HHmmss')"
+        provider = "local"
+        root_path = "d:/hh/git/g1/fold/test/sample-files"
     } | ConvertTo-Json
 
     try {
@@ -173,6 +177,8 @@ if (-not $Token) {
         name = "search-test-$(Get-Date -Format 'HHmmss')"
         slug = "srch-test-$(Get-Date -Format 'HHmmss')"
         description = "Project for testing semantic search"
+        provider = "local"
+        root_path = "d:/hh/git/g1/fold/test/sample-files"
     } | ConvertTo-Json
 
     try {
@@ -239,15 +245,15 @@ if (-not $Token) {
             name = "config-test-$(Get-Date -Format 'HHmmss')"
             slug = "cfg-test-$(Get-Date -Format 'HHmmss')"
             description = "Testing project configuration"
+            provider = "local"
             root_path = "/test/path"
-            repo_url = "https://github.com/test/repo"
         } | ConvertTo-Json
 
         $configProj = Invoke-RestMethod -Uri "$FoldUrl/projects" -Method POST -Headers $headers -Body $configBody
         $configProjectId = $configProj.id
 
         Test-Step "Project created with config" {
-            $configProj.root_path -eq "/test/path" -or $configProj.repo_url -eq "https://github.com/test/repo" -or $configProj.id -ne $null
+            $configProj.root_path -eq "/test/path" -or $configProj.id -ne $null
         }
 
         Test-Step "Update project settings" {
